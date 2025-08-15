@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - Base de Connaissances</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+ </head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- Header banner: same identity as home (office names only) -->
+    <header class="bg-blue-600 text-white">
+        <div class="container mx-auto px-4 py-2">
+            <div class="flex justify-center items-center">
+                <a href="{% url 'home' %}" class="text-center flex-1 block text-white no-underline focus:outline-none focus:ring-2 focus:ring-yellow-400 rounded">
+                    <h1 class="text-lg font-bold mb-1"> المكتب الوطني للكهرباء و الماء الصالح للشرب </h1>
+                    <div class="flex justify-center space-x-4 mb-1">
+                        <div class="w-8 h-0.5 bg-blue-400"></div>
+                        <div class="w-8 h-0.5 bg-yellow-400"></div>
+                    </div>
+                    <h2 class="text-base">Office National de l'Electricité et de l'Eau Potable</h2>
+                </a>
+            </div>
+        </div>
+    </header>
+    
+    <main class="flex-1 flex items-center justify-center">
+        <div class="max-w-md w-full space-y-8 px-4 py-10">
+            <h2 class="text-center text-3xl font-extrabold text-gray-900">Connexion à votre compte</h2>
+            
+            <form class="mt-8 space-y-6" method="post">
+                {% csrf_token %}
+                <div class="rounded-md shadow-sm -space-y-px">
+                    <div>
+                        <label for="id_username" class="sr-only">Nom d'utilisateur</label>
+                        <input id="id_username" name="username" type="text" required 
+                               class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" 
+                               placeholder="Nom d'utilisateur">
+                    </div>
+                    <div>
+                        <label for="id_password" class="sr-only">Mot de passe</label>
+                        <input id="id_password" name="password" type="password" required 
+                               class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" 
+                               placeholder="Mot de passe">
+                    </div>
+                </div>
+
+                {% if form.errors %}
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                        <p>Nom d'utilisateur ou mot de passe incorrect.</p>
+                    </div>
+                {% endif %}
+
+                <div>
+                    <button type="submit" 
+                            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                            <i class="fas fa-sign-in-alt"></i>
+                        </span>
+                        Se connecter
+                    </button>
+                </div>
+                
+                <div class="text-center">
+                    <a href="{% url 'home' %}" class="text-blue-600 hover:text-blue-500">
+                        Retour à l'accueil
+                    </a>
+                </div>
+            </form>
+        </div>
+    </main>
+</body>
+</html>

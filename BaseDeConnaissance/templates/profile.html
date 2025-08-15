@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil - Base de Connaissances</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .card { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+    </style>
+ </head>
+<body class="bg-gray-50 min-h-screen">
+    
+    <header class="bg-blue-600 text-white">
+        <div class="container mx-auto px-4 py-2">
+            <div class="flex justify-center items-center">
+                <a href="{% url 'home' %}" class="text-center flex-1 block text-white no-underline focus:outline-none focus:ring-2 focus:ring-yellow-400 rounded">
+                    <h1 class="text-lg font-bold mb-1"> المكتب الوطني للكهرباء و الماء الصالح للشرب </h1>
+                    <div class="flex justify-center space-x-4 mb-1">
+                        <div class="w-8 h-0.5 bg-blue-400"></div>
+                        <div class="w-8 h-0.5 bg-yellow-400"></div>
+                    </div>
+                    <h2 class="text-base">Office National de l'Electricité et de l'Eau Potable</h2>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Profile header card -->
+            <div class="bg-white rounded-lg p-6 card mb-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        {% if user.profile.avatar %}
+                            <img src="{{ user.profile.avatar.url }}" class="w-20 h-20 rounded-full border" alt="avatar" />
+                        {% else %}
+                            <div class="w-20 h-20 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center border">
+                                <i class="fas fa-user text-3xl"></i>
+                            </div>
+                        {% endif %}
+                        <div>
+                            <h2 class="text-2xl font-semibold text-gray-800">{{ user.get_full_name|default:user.username }}</h2>
+                            <p class="text-gray-600">{{ user.email }}</p>
+                            <p class="text-gray-400 text-sm">Dernière connexion: {{ user.last_login }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <a href="{% url 'home' %}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition">Accueil</a>
+                        <a href="{% url 'logout' %}" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition">Déconnexion</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Avatar update -->
+                <div class="bg-white rounded-lg p-6 card">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Mettre à jour l'avatar</h3>
+                    <form method="post" enctype="multipart/form-data" action="{% url 'profile' %}">
+                        {% csrf_token %}
+                        <div class="flex items-center space-x-4">
+                            {% if user.profile.avatar %}
+                                <img src="{{ user.profile.avatar.url }}" class="w-16 h-16 rounded-full border" alt="avatar" />
+                            {% else %}
+                                <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                                    <i class="fas fa-user text-2xl"></i>
+                                </div>
+                            {% endif %}
+                            <div class="flex-1">
+                                <input type="file" name="avatar" accept="image/*" class="text-sm w-full" />
+                                <button class="mt-3 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Enregistrer</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Information -->
+                <div class="bg-white rounded-lg p-6 card lg:col-span-2">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Informations du compte</h3>
+                    <form method="post" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
+                        {% csrf_token %}
+                        <input type="hidden" name="update_info" value="1" />
+                        <div>
+                            <div class="text-gray-500">Nom d'utilisateur</div>
+                            <input name="username" value="{{ user.username }}" class="mt-1 w-full border rounded px-2 py-1" />
+                        </div>
+                        <div>
+                            <div class="text-gray-500">Prénom</div>
+                            <input name="first_name" value="{{ user.first_name }}" class="mt-1 w-full border rounded px-2 py-1" />
+                        </div>
+                        <div>
+                            <div class="text-gray-500">Nom</div>
+                            <input name="last_name" value="{{ user.last_name }}" class="mt-1 w-full border rounded px-2 py-1" />
+                        </div>
+                        <div>
+                            <div class="text-gray-500">Email</div>
+                            <input type="email" name="email" value="{{ user.email }}" class="mt-1 w-full border rounded px-2 py-1" />
+                        </div>
+                        <div>
+                            <div class="text-gray-500">Dernière connexion</div>
+                            <div class="font-medium mt-1">{{ user.last_login|date:'d/m/Y H:i' }}</div>
+                        </div>
+                        <div class="md:col-span-2 flex justify-end">
+                            <button class="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Enregistrer</button>
+                        </div>
+                    </form>
+                </div>
+
+                {% if not is_admin %}
+                    <!-- Recent admin notes (seen by regular users) -->
+                    <div class="bg-white rounded-lg p-6 card lg:col-span-3">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Notes administrateur</h3>
+                        <div class="space-y-3">
+                            {% for note in recent_notes %}
+                                <div class="p-3 border rounded flex justify-between items-start">
+                                    <div>
+                                        <p class="text-gray-800">{{ note.contenu }}</p>
+                                        <p class="text-xs text-gray-400 mt-1">{{ note.date_creation|date:'d/m/Y H:i' }}</p>
+                                    </div>
+                                    {% if not note.est_vu %}
+                                        <span class="inline-block w-2.5 h-2.5 bg-red-500 rounded-full"></span>
+                                    {% endif %}
+                                </div>
+                            {% empty %}
+                                <p class="text-gray-500">Aucune note.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- Admin: send notes form and recent sent notes -->
+                    <div class="bg-white rounded-lg p-6 card lg:col-span-3">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Envoyer une note aux utilisateurs</h3>
+                        <form method="post" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                            {% csrf_token %}
+                            <input type="hidden" name="send_note" value="1" />
+                            <div class="md:col-span-2">
+                                <label class="block text-sm text-gray-600 mb-1">Utilisateur</label>
+                                <select name="to_user_id" class="w-full border rounded px-2 py-2">
+                                    {% for u in all_users %}
+                                        <option value="{{ u.id }}">{{ u.username }}{% if u.get_full_name %} ({{ u.get_full_name }}){% endif %}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm text-gray-600 mb-1">Message</label>
+                                <input name="note_content" class="w-full border rounded px-2 py-2" placeholder="Votre message..." />
+                            </div>
+                            <div class="md:col-span-4 flex justify-end">
+                                <button class="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Envoyer</button>
+                            </div>
+                        </form>
+
+                        <h4 class="text-md font-semibold text-gray-800 mt-6 mb-2">Dernières notes envoyées</h4>
+                        <div class="space-y-3">
+                            {% for note in recent_sent_notes %}
+                                <div class="p-3 border rounded flex justify-between items-start">
+                                    <div>
+                                        <p class="text-gray-800">À <span class="font-medium">{{ note.user.username }}</span> — {{ note.contenu }}</p>
+                                        <p class="text-xs text-gray-400 mt-1">{{ note.date_creation|date:'d/m/Y H:i' }}</p>
+                                    </div>
+                                </div>
+                            {% empty %}
+                                <p class="text-gray-500">Aucune note envoyée récemment.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</body>
+</html>
+

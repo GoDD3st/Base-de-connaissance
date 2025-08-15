@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ article.titre }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>.prose p {margin-bottom: .75rem}</style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <header class="bg-blue-600 text-white">
+        <div class="container mx-auto px-4 py-2 text-center">
+            <h1 class="text-lg font-bold mb-1">ONEE - Base de connaissances</h1>
+            <h2 class="text-base">Article</h2>
+        </div>
+    </header>
+    <nav class="bg-blue-600 text-white">
+        <div class="container mx-auto px-4 py-2">
+            <a href="{% url 'home' %}" class="hover:text-blue-200">Accueil</a>
+        </div>
+    </nav>
+    <main class="container mx-auto px-4 py-8">
+        <article class="bg-white rounded-lg shadow p-6 mb-8">
+            <h1 class="text-2xl font-bold mb-2">{{ article.titre }}</h1>
+            <div class="text-sm text-gray-500 mb-4">Catégorie: {{ article.categorie.nom }} • Publié le {{ article.date_creation|date:"d/m/Y" }}</div>
+            <div class="prose max-w-none text-gray-800">{{ article.contenu|linebreaks }}</div>
+        </article>
+
+        <section class="bg-white rounded-lg shadow p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4">Solutions validées ({{ solutions.count }})</h2>
+            {% if solutions %}
+                <div class="space-y-4">
+                    {% for s in solutions %}
+                        <div class="border rounded p-4">
+                            <div class="text-sm text-gray-500 mb-2">Proposée par {{ s.auteur.username|default:'Anonyme' }} le {{ s.date_creation|date:"d/m/Y H:i" }}</div>
+                            <p class="text-gray-800">{{ s.contenu|linebreaks }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-gray-600">Aucune solution validée pour le moment.</p>
+            {% endif %}
+        </section>
+
+        {% if user.is_authenticated %}
+        <section class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">Proposer une solution</h2>
+            <form action="{% url 'proposer_solution' article.id %}" method="post" class="space-y-3">
+                {% csrf_token %}
+                <textarea name="contenu" rows="4" class="w-full border rounded p-3" placeholder="Décrivez votre solution..." required></textarea>
+                <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Soumettre pour validation</button>
+            </form>
+        </section>
+        {% else %}
+            <div class="text-center text-sm text-gray-600">Connectez-vous pour proposer une solution.</div>
+        {% endif %}
+
+        <!-- Commentaires -->
+        <section class="bg-white rounded-lg shadow p-6 mt-8">
+            <h2 class="text-xl font-semibold mb-4">Commentaires ({{ commentaires.count }})</h2>
+            {% if commentaires %}
+                <div class="space-y-4 mb-6">
+                    {% for c in commentaires %}
+                        <div class="border rounded p-3">
+                            <div class="text-sm text-gray-500">Par {{ c.auteur.username|default:'Anonyme' }} • {{ c.date_creation|date:"d/m/Y H:i" }}</div>
+                            <p class="mt-2 text-gray-800">{{ c.contenu|linebreaks }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-gray-600 mb-6">Aucun commentaire pour le moment.</p>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+            <form action="{% url 'ajouter_commentaire' article.id %}" method="post" class="space-y-3">
+                {% csrf_token %}
+                <textarea name="contenu" rows="3" class="w-full border rounded p-3" placeholder="Ajouter un commentaire..." required></textarea>
+                <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Publier</button>
+            </form>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>
+

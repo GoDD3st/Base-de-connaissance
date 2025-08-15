@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créer un Article - Base de Connaissances</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header Banner (Blue) - reuse site style -->
+    <header class="bg-blue-600 text-white">
+        <div class="container mx-auto px-4 py-2">
+            <div class="flex justify-center items-center">
+                <a href="{% url 'home' %}" class="text-center flex-1 block text-white no-underline focus:outline-none focus:ring-2 focus:ring-yellow-400 rounded">
+                    <h1 class="text-lg font-bold mb-1"> المكتب الوطني للكهرباء و الماء الصالح للشرب </h1>
+                    <div class="flex justify-center space-x-4 mb-1">
+                        <div class="w-8 h-0.5 bg-blue-400"></div>
+                        <div class="w-8 h-0.5 bg-yellow-400"></div>
+                    </div>
+                    <h2 class="text-base">Office National de l'Electricité et de l'Eau Potable</h2>
+                </a>
+            </div>
+        </div>
+    </header>
+    <nav class="bg-blue-600 text-white">
+        <div class="container mx-auto px-4 py-2">
+            <div class="flex justify-between items-center">
+                <div class="flex space-x-4 text-sm justify-center w-full">
+                    <a href="{% url 'home' %}" class="hover:text-blue-200">Accueil</a>
+                    <span class="text-blue-300">|</span>
+                    <a href="{% url 'redacteur_dashboard' %}" class="hover:text-blue-200">Dashboard</a>
+                    <span class="text-blue-300">|</span>
+                    <a href="{% url 'mes_articles' %}" class="hover:text-blue-200">Mes Articles</a>
+                    <span class="text-blue-300">|</span>
+                    <a href="{% url 'creer_article' %}" class="hover:text-blue-200 font-semibold">Créer Article</a>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="{% url 'profile' %}" class="relative inline-block">
+                        {% if user.profile.avatar %}
+                            <img src="{{ user.profile.avatar.url }}" alt="avatar" class="w-9 h-9 rounded-full border-white shadow"/>
+                        {% else %}
+                            <div class="w-9 h-9 rounded-full bg-white text-blue-600 flex items-center justify-center border-2 border-white shadow">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        {% endif %}
+                    </a>
+                    <a href="{% url 'logout' %}" class="hover:text-blue-200 underline">Déconnexion</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h1 class="text-2xl font-semibold text-gray-800 mb-6">Créer un nouvel article</h1>
+                
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <div>
+                        <label for="titre" class="block text-sm font-medium text-gray-700 mb-2">Titre de l'article</label>
+                        <input type="text" id="titre" name="titre" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               placeholder="Entrez le titre de votre article">
+                    </div>
+                    
+                    <div>
+                        <label for="categorie" class="block text-sm font-medium text-gray-700 mb-2">Catégorie</label>
+                        <select id="categorie" name="categorie" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Sélectionnez une catégorie</option>
+                            {% for categorie in categories %}
+                                <option value="{{ categorie.id }}">{{ categorie.nom }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="contenu" class="block text-sm font-medium text-gray-700 mb-2">Contenu de l'article</label>
+                        <textarea id="contenu" name="contenu" rows="12" required
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                  placeholder="Rédigez le contenu de votre article..."></textarea>
+                    </div>
+                    
+                    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-info-circle text-blue-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-blue-700">
+                                    <strong>Note :</strong> Votre article sera soumis pour validation par un administrateur avant publication.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-4">
+                        <a href="{% url 'redacteur_dashboard' %}" 
+                           class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition">
+                            Annuler
+                        </a>
+                        <button type="submit" 
+                                class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                            <i class="fas fa-save mr-2"></i>
+                            Créer l'article
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
